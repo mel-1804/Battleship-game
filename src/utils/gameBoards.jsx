@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import "../App.css";
 
-const GameBoard = ({ board, onCellClick, isEnemy }) => {
+export const GameBoard = ({ board, onCellClick, isEnemy }) => {
   return (
     <div className="board">
       {board.map((row, rowIndex) => (
@@ -27,5 +27,3 @@ GameBoard.propTypes = {
   onCellClick: PropTypes.func, // Handles the clics on the enemy's board
   isEnemy: PropTypes.bool, // Makes differences between boards
 };
-
-export default GameBoard;
