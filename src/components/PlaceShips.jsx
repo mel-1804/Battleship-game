@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 
 const BOARD_SIZE = 10;
-const SHIP_SIZES = [5, 4, 3, 3, 2]; // Tamaños de los barcos
+const SHIP_SIZES = [5, 4, 3, 3, 2]; // Ships size
 
 export const PlaceShips = ({ onShipsPlaced }) => {
   const [board, setBoard] = useState(
@@ -19,7 +19,7 @@ export const PlaceShips = ({ onShipsPlaced }) => {
     const shipSize = SHIP_SIZES[currentShip];
     const newBoard = board.map((row) => [...row]);
 
-    // Verificar si el barco cabe en la dirección seleccionada
+    // Check if the boat fits in the selected address
     for (let i = 0; i < shipSize; i++) {
       const r = isHorizontal ? row : row + i;
       const c = isHorizontal ? col + i : col;
@@ -29,7 +29,7 @@ export const PlaceShips = ({ onShipsPlaced }) => {
       }
     }
 
-    // Colocar el barco en el tablero
+    // Place the ship on the board
     for (let i = 0; i < shipSize; i++) {
       const r = isHorizontal ? row : row + i;
       const c = isHorizontal ? col + i : col;

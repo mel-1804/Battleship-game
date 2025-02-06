@@ -13,7 +13,7 @@ Para poder ejecutar este proyecto en tu máquina local, asegúrate de tener lo s
 - **Visual Studio Code** o cualquier editor de código que prefieras.
 - **Git** para clonar el repositorio desde GitHub.
 
-## Instrucciones para ejecutar el juego
+## Instrucciones para ejecutar el juego DE MANERA LOCAL:
 
 Sigue estos pasos para ejecutar el proyecto en tu computadora local:
 
@@ -39,3 +39,21 @@ Sigue estos pasos para ejecutar el proyecto en tu computadora local:
    npm start
 
    Este comando abrirá el proyecto en tu navegador predeterminado en la dirección http://localhost:3000, allí puedes jugar.
+
+## Instrucciones para ejecutar el juego EN CODESPACES:
+
+Si prefieres jugar al **Battleship** directamente desde GitHub sin necesidad de instalar nada, puedes abrir el proyecto en **GitHub Codespaces**. Esta opción te permite ejecutar el juego en un entorno de desarrollo en la nube proporcionado por GitHub.
+
+Sigue estos pasos para jugar en GitHub Codespaces:
+
+1. **Acceder al repositorio en GitHub:**
+   Abre el repositorio del proyecto en tu navegador. Por ejemplo:
+   [https://github.com/tu-usuario/battleship-game](https://github.com/tu-usuario/battleship-game)
+
+2. **Abrir en Codespaces:**
+   Haz clic en el botón verde **Code** en la parte superior derecha del repositorio, y selecciona la opción **Open with Codespaces**. Si es la primera vez que usas Codespaces, es posible que debas autorizar a GitHub a crear un espacio de trabajo.
+
+3. **Iniciar el entorno:**
+   Una vez que se abra el entorno de Codespaces, se instalarán las dependencias necesarias automáticamente. Si no se instala automáticamente, puedes abrir el terminal dentro de Codespaces y ejecutar el siguiente comando:
+
+   npm install

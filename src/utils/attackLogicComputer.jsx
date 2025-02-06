@@ -7,16 +7,19 @@ export const handleComputerAttack = (
   setWinner
 ) => {
   setTimeout(() => {
-    const freshPlayerBoard = playerBoard.map((row) => row.slice()); // Clone the current player board
-    const freshAttackedCells = [...attackedCells]; // Clone the attacked cells list
+    const freshPlayerBoard = playerBoard.map((row) => row.slice()); // Clone the current board
+    const freshAttackedCells = [...attackedCells]; // Clone the attack list
 
-    let targetCell;
+    let targetCell = null;
     let possibleTargets = [];
+
     let lastHits = freshAttackedCells.filter(
-      ([r, c]) => freshPlayerBoard[r][c] === 2 // Successful hits
+      ([r, c]) => freshPlayerBoard[r][c] === 2 // Filter only successful hits
     );
 
     const findPossibleTargets = (hitRow, hitCol) => {
+      let newTargets = [];
+
       [
         [hitRow - 1, hitCol], // Above
         [hitRow + 1, hitCol], // Below
@@ -28,88 +31,68 @@ export const handleComputerAttack = (
           r < 10 &&
           c >= 0 &&
           c < 10 &&
-          freshPlayerBoard[r][c] !== 2 &&
-          freshPlayerBoard[r][c] !== 3
+          freshPlayerBoard[r][c] !== 2 && // Have not been impacted
+          freshPlayerBoard[r][c] !== 3 // It was not a fail
         ) {
-          possibleTargets.push([r, c]); // Add to possible targets
+          newTargets.push([r, c]);
         }
       });
+
+      possibleTargets.push(...newTargets);
     };
 
-    // Case 1: What to do after the first impact
+    // Case 1: If there are recent impacts, prioritize the right direction
     if (lastHits.length > 0) {
       lastHits.sort(([r1, c1], [r2, c2]) => r1 - r2 || c1 - c2);
 
-      // Verification of isolated cells (cells that are not next to another hit)
-      const isolatedHits = lastHits.filter(([r, c]) => {
-        return !lastHits.some(
-          ([nr, nc]) =>
-            (nr === r - 1 && nc === c) || // Neighbor above
-            (nr === r + 1 && nc === c) || // Neighbor below
-            (nr === r && nc === c - 1) || // Neighbor left
-            (nr === r && nc === c + 1) // Neighbor right
-        );
-      });
+      // Check if there are impacts aligned in a row or column
+      const [firstHitRow, firstHitCol] = lastHits[0];
+      const isHorizontal = lastHits.every(([r]) => r === firstHitRow);
+      const isVertical = lastHits.every(([, c]) => c === firstHitCol);
 
-      // Looking for new cells to attack
-      if (isolatedHits.length > 0) {
-        const [hitRow, hitCol] = isolatedHits[0];
-        findPossibleTargets(hitRow, hitCol);
-      }
-
-      // Case 2: More than one impacted cell (consecutive hits)
-      if (lastHits.length >= 2 && isolatedHits.length === 0) {
+      if (isHorizontal || isVertical) {
         const [firstHitRow, firstHitCol] = lastHits[0];
         const [lastHitRow, lastHitCol] = lastHits[lastHits.length - 1];
 
-        console.log("Consecutive hits detected:", lastHits);
-
-        // Horizontal hits
-        if (firstHitRow === lastHitRow) {
-          // Try right attack
+        // Follow the right direction first
+        if (isHorizontal) {
           if (
             lastHitCol + 1 < 10 &&
             freshPlayerBoard[lastHitRow][lastHitCol + 1] !== 2 &&
             freshPlayerBoard[lastHitRow][lastHitCol + 1] !== 3
           ) {
-            targetCell = [lastHitRow, lastHitCol + 1];
-          }
-          // Try left attack
-          else if (
+            targetCell = [lastHitRow, lastHitCol + 1]; // Right
+          } else if (
             firstHitCol - 1 >= 0 &&
             freshPlayerBoard[firstHitRow][firstHitCol - 1] !== 2 &&
             freshPlayerBoard[firstHitRow][firstHitCol - 1] !== 3
           ) {
-            targetCell = [firstHitRow, firstHitCol - 1];
+            targetCell = [firstHitRow, firstHitCol - 1]; // Left
           }
         }
 
-        // Vertical hits
-        if (firstHitCol === lastHitCol) {
-          // Try below attack
+        if (isVertical) {
           if (
             lastHitRow + 1 < 10 &&
             freshPlayerBoard[lastHitRow + 1][lastHitCol] !== 2 &&
             freshPlayerBoard[lastHitRow + 1][lastHitCol] !== 3
           ) {
-            targetCell = [lastHitRow + 1, lastHitCol];
-          }
-          // Try above attack
-          else if (
+            targetCell = [lastHitRow + 1, lastHitCol]; // Below
+          } else if (
             firstHitRow - 1 >= 0 &&
             freshPlayerBoard[firstHitRow - 1][firstHitCol] !== 2 &&
             freshPlayerBoard[firstHitRow - 1][firstHitCol] !== 3
           ) {
-            targetCell = [firstHitRow - 1, firstHitCol];
+            targetCell = [firstHitRow - 1, firstHitCol]; // Above
           }
         }
+      } else {
+        // If they are not aligned, look for new possible attacks
+        lastHits.forEach(([r, c]) => findPossibleTargets(r, c));
       }
     }
 
-    // Log possible targets
-    console.log("Possible targets:", possibleTargets);
-
-    // If no target cell was found, choose the first valid cell from possible targets
+    // Case 2: If there is no direct target, search in `possibleTargets`
     if (!targetCell && possibleTargets.length > 0) {
       for (let i = 0; i < possibleTargets.length; i++) {
         const [r, c] = possibleTargets[i];
@@ -120,7 +103,16 @@ export const handleComputerAttack = (
       }
     }
 
-    // If still no target cell, choose a completely random cell
+    // Case 3: If there are no other options, re-analyze `lastHits`
+    if (!targetCell && lastHits.length > 0) {
+      lastHits.forEach(([r, c]) => findPossibleTargets(r, c));
+
+      if (possibleTargets.length > 0) {
+        targetCell = possibleTargets[0];
+      }
+    }
+
+    // Case 4: If there is still no target, attack randomly
     if (!targetCell) {
       let randomRow, randomCol;
       do {
@@ -133,14 +125,11 @@ export const handleComputerAttack = (
       targetCell = [randomRow, randomCol];
     }
 
-    // Log the selected target cell
-    console.log("Target cell:", targetCell);
-
-    // Attack the target cell
+    // Attack the selected cell
     const [targetRow, targetCol] = targetCell;
     const newPlayerBoard = freshPlayerBoard.map((row) => row.slice());
     newPlayerBoard[targetRow][targetCol] =
-      newPlayerBoard[targetRow][targetCol] === 1 ? 2 : 3; // Mark the cell as hit or miss
+      newPlayerBoard[targetRow][targetCol] === 1 ? 2 : 3; // Impact or fail
 
     setPlayerBoard(newPlayerBoard);
     setAttackedCells((prev) => [...prev, targetCell]);
@@ -148,5 +137,5 @@ export const handleComputerAttack = (
     if (checkWinner(newPlayerBoard)) {
       setWinner("computer");
     }
-  }, 1000); // Simulate a "thinking" delay
+  }, 1000); // Simulation of "thinking time"
 };
