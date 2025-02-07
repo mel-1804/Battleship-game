@@ -36,7 +36,7 @@ Sigue estos pasos para ejecutar el proyecto en tu computadora local:
 4. **Iniciar el servidor de desarrollo:**
    Usa el comando:
 
-   npm start
+   npm run dev
 
    Este comando abrirá el proyecto en tu navegador predeterminado en la dirección http://localhost:3000, allí puedes jugar.
 

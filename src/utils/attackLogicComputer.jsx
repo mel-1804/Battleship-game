@@ -137,5 +137,5 @@ export const handleComputerAttack = (
     if (checkWinner(newPlayerBoard)) {
       setWinner("computer");
     }
-  }, 1000); // Simulation of "thinking time"
+  }, 500); // Simulation of "thinking time"
 };
